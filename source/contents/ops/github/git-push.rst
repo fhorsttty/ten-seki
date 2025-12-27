@@ -62,8 +62,10 @@ gitの初期設定をする。
 .. code-block:: bash
 
    git config --global --list
-   git config --global user.name=<user>
-   git config --global user.email=<email-address>
+   git config --global user.name <user>
+   git config --global user.email <email-address>
+   git config --global --unset user.name  # 削除したい時
+
    git config --global init.defaultBranch main
    git config --global --list
 
