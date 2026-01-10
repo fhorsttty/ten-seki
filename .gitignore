@@ -1,6 +1,6 @@
 /build
 /source/_templates
 /source/_static
-/source/contents/.pend
+/source/contents/_pend
 make.bat
 Makefile

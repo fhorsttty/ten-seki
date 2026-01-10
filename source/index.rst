@@ -17,3 +17,4 @@ documentation for details.
 
    contents/dev/index
    contents/ops/index
+   contents/_pend/index

@@ -7,3 +7,4 @@ dev
    
    anyenv/index
    python/index
+   web/index

@@ -8,3 +8,4 @@ ops
    docker/index
    github/index
    nftables/index
+   windows/index
