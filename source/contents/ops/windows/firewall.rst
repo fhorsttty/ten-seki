@@ -7,6 +7,10 @@ firewall
 
 ファイアウォールの設定をエクスポートする。
 
+.. attention::
+
+   バイナリ形式のため設定内容を確認することはできません。
+
 .. code-block:: bat
 
    netsh advfirewall export "C:/temp/firewall-dump.wfw"
@@ -38,6 +42,54 @@ firewall
 
 ファイアウォールの操作
 =======================
+
+ファイアウォールの設定を出力する。
+
+.. code-block:: powershell
+
+   # コマンドとして登録する
+   # notepad $PROFILE
+   # . $PROFILE
+
+   function Get-MyNetFirewallRule {
+     Get-NetFirewallRule | ForEach-Object {
+       $port = $_ | Get-NetFirewallPortFilter
+       $address = $_ | Get-NetFirewallAddressFilter
+       $service = $_ | Get-NetFirewallServiceFilter
+       $app = $_ | Get-NetFirewallApplicationFilter
+
+       [PSCustomObject]@{
+         Name = $_.DisplayName
+         Profile = $_.Profile
+         Enabled = $_.Enabled
+         Direction = $_.Direction
+         Protocol = $_.Protocol
+         LocalAddr = $address.LocalAddress
+         LocalPort = $port.LocalPort
+         RemoteAddr = $address.RemoteAddress
+         RemotePort = $port.RemotePort
+         Action = $_.Action
+         Service = $service.Service
+         Program = $app.Program
+       }
+     }
+
+.. attention::
+
+   ルールの基本情報（名前、方向等）と詳細情報（IPアドレス、ポート番号、プロトコル等）はWindows内部では別テーブルで管理されています。
+
+
+ルールの色々な出力方法
+
+.. code-block:: bat
+
+   Get-NetFirewallRule | Select-Object DisplayName | Format-List | Out-File "firewall-dump.txt"
+   Get-NetFirewallRule | Select-Object DisplayName | Format-Table -AutSize | Out-File -FilePath "firewall-dump.txt" -Width 512
+   Get-NetFirewallRule | Select-Object DisplayName | Export-Csv -Path "firewall-dump.csv" -Encoding UTF8 -NoTypeInformation
+
+.. code-block:: bat
+
+   netsh advfirewall firewall show rule name=all verbose > firewall-dumb.txt
 
 各プロファイル（ドメイン／プライベート／パブリック）の状態を確認する。
 
@@ -85,7 +137,9 @@ firewall
 
 .. code-block:: powershell
 
-   New-NetFirewallRule -DisplayName "Allow Port 8080" -Direction Inbound -LocalPort 8080 -Protocol TCP -Action Allow
+   New-NetFirewallRule -DisplayName "Allow Port 8080" -Direction Inbound -Protocol TCP -LocalPort 8080  -Action Allow
+   New-NetFirewallRule -DisplayName "Allow DNS Service" -Direction Outbound -Service dnscache -Protocol UDP -Action Allow
+   New-NetFirewallRule -DisplayName "Allow Edge" -Direction Outbound -Protocol TCP -RemotePort 443 -Action Allow -Program "C:/Program Files (x86)/Microsoft/Edge/Application/msedge.exe"
    
 .. code-block:: bat
 
