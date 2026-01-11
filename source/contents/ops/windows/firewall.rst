@@ -33,6 +33,35 @@ firewall
 
    Get-NetFirewallRule | Remove-NetFirewallRule
 
+.. attention::
+
+   すべての通信が遮断されるのではなく、デフォルトの動作に戻る。
+
+   - 受信（Inbound）: すべて遮断（NotConfiguredと表示された場合の規定動作）
+   - 送信（Outbound）: すべて許可（NotConfiguredと表示された場合の規定動作）
+
+送信に暗黙のDenyを設定する。
+
+.. code-block:: bat
+
+   Set-NetFirewallProfile -Profile Domain, Public, Private -DefaultOutboundAction Block
+   Get-NetFirewallProfile | Select-Object Name, Enabled, DefaultInboundAction, DefaultOutboundAction
+
+.. attention::
+
+   Windowsには、ルールを削除しても ``System-Protected`` 属性が付加されているルールは除外したり、コア・ネットワーク・ルールを自動的に復元する機能がある。
+
+   - コア・ネットワーク・ルール: DHCP, DNS, ICMP, WS-Discovery/SSDP, LLNMR, NTP
+
+   WSH（Windows Service Hardening）は、Windowsサービスが共通プロセス（svchost.exe）で動作するようになったため、サービス単位で通信制減を設ける機能で、ファイアウォールより優先される。
+
+コア・ネットワーク・ルールを表示する。
+
+.. code-block:: bat
+
+   Get-NetFirewallRule -Group "@FirewallAPI.dll,-28502" | Select-Object DisplayName, Enabled, Direction, Action | Format-Table -AutoSize
+   
+
 ファイアウォールの設定をインポートする。
 
 .. code-block:: bat
@@ -150,6 +179,12 @@ firewall
 .. code-block:: powershell
 
    Remove-NetFirewallRule -DisplayName "Allow Port 8080"
+
+通信ログの解析
+
+.. code-block:: bat
+
+   netsh wfp show state
 
 
 
